@@ -1,6 +1,5 @@
 import shelve
 from dataclasses import dataclass
-from enum import Enum, auto
 from typing import Union
 from contextlib import contextmanager
 from pathlib import Path
@@ -10,26 +9,25 @@ from bs4 import BeautifulSoup
 
 URL = "https://dns.he.net/"
 
-
-class RType(Enum):
-    AAAA = auto()
-    A = auto()
-    AFSDB = auto()
-    ALIAS = auto()
-    CAA = auto()
-    CNAME = auto()
-    HINFO = auto()
-    LOC = auto()
-    MX = auto()
-    NAPTR = auto()
-    NS = auto()
-    PTR = auto()
-    RP = auto()
-    SOA = auto()
-    SPF = auto()
-    SRV = auto()
-    SSHFP = auto()
-    TXT = auto()
+RType = str
+AAAA: RType = "AAAA"
+A: RType = "A"
+AFSDB: RType = "AFSDB"
+ALIAS: RType = "ALIAS"
+CAA: RType = "CAA"
+CNAME: RType = "CNAME"
+HINFO: RType = "HINFO"
+LOC: RType = "LOC"
+MX: RType = "MX"
+NAPTR: RType = "NAPTR"
+NS: RType = "NS"
+PTR: RType = "PTR"
+RP: RType = "RP"
+SOA: RType = "SOA"
+SPF: RType = "SPF"
+SRV: RType = "SRV"
+SSHFP: RType = "SSHFP"
+TXT: RType = "TXT"
 
 
 @dataclass(eq=True, frozen=True)
@@ -64,7 +62,7 @@ def sync(username, password, domain, rrs):
         current_rrs = dict(parse_rrs(doc))
 
         for rr, id in current_rrs.items():
-            if rr.rtype == RType.SOA:
+            if rr.rtype == SOA:
                 continue
             if rr not in rrs:
                 print(f"- {rr}")
@@ -79,9 +77,8 @@ def sync(username, password, domain, rrs):
 def parse_rrs(doc):
     for row in doc.select(".dns_tr_locked, .dns_tr"):
         fields = [v.text for v in row.select("td")]
-        id, rname, rtype_name, ttl, priority, rdata = fields[1:7]
-        rtype = RType[rtype_name]
-        if rtype == RType.MX:
+        id, rname, rtype, ttl, priority, rdata = fields[1:7]
+        if rtype == MX:
             assert priority.isnumeric()
             rr = RR(rname, int(ttl), rtype, (int(priority), rdata))
         else:
@@ -106,7 +103,7 @@ def add_domain(session, domain):
 
 
 def add_rr(session, zone_id, rr):
-    if rr.rtype == RType.MX:
+    if rr.rtype == MX:
         priority, rdata = rr.rdata
     else:
         priority, rdata = "", rr.rdata
@@ -116,7 +113,7 @@ def add_rr(session, zone_id, rr):
         {
             "account": "",
             "menu": "edit_zone",
-            "Type": rr.rtype.name,
+            "Type": rr.rtype,
             "hosted_dns_zoneid": zone_id,
             "hosted_dns_recordid": "",
             "hosted_dns_editzone": "1",
