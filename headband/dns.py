@@ -30,6 +30,3 @@ class RR:
     ttl: int
     rtype: RType
     rdata: Union[str | tuple[int, str]]
-
-    def key(self):
-        return (self.rname, self.rtype)

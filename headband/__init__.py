@@ -33,27 +33,18 @@ def sync(username, password, domain, rrs):
         )
         doc = parse_html(response.content)
         current_rrs = dict(parse_rrs(doc))
-        pprint(current_rrs)
 
-        for rr1 in rrs:
-            if rr1 in current_rrs:
+        for rr, id in current_rrs.items():
+            if rr.rtype == RType.SOA:
                 continue
-            for rr2, rr2_id in current_rrs.items():
-                if rr1.key() == rr2.key():
-                    del_rr(session, zone_id, rr2_id)
-                    print(f"~ {rr1}")
-                    add_rr(session, zone_id, rr1)
-                    break
-            else:
-                print(f"+ {rr1}")
-                add_rr(session, zone_id, rr1)
+            if rr not in rrs:
+                print(f"- {rr}")
+                del_rr(session, zone_id, id)
 
-        for rr2, rr2_id in current_rrs.items():
-            if rr2.rtype == RType.SOA:
-                continue
-            if rr2.key() not in set(rr.key() for rr in rrs):
-                print(f"- {rr2}")
-                del_rr(session, zone_id, rr2_id)
+        for rr in rrs:
+            if rr not in current_rrs:
+                print(f"+ {rr}")
+                add_rr(session, zone_id, rr)
 
 
 def parse_rrs(doc):
