@@ -1,13 +1,28 @@
 # headband
 
-Configure Hurricane Electric DNS to serve your domains:
+Programmatically sync domains to Hurricane Electric's primary DNS service.
 
-* Configure an `he.net` account so that HE acts as a secondary DNS server for
-  your domain.
-* Run a primary DNS server, temporarily, to serve dns.he.net's initial zone
-  transfer request.
+```python
+import headband
+from headband.dns import RR, RType
 
-## TODO
+zone = [
+    RR("example.com", 172800, RType.NS, "ns1.he.net"),
+    RR("example.com", 172800, RType.NS, "ns2.he.net"),
+    RR("example.com", 172800, RType.NS, "ns3.he.net"),
+    RR("example.com", 172800, RType.NS, "ns4.he.net"),
+    RR("example.com", 172800, RType.NS, "ns5.he.net"),
+    RR("www.example.com", 300, RType.CNAME, "server.example.com."),
+    RR("mail.example.com", 300, RType.CNAME, "server.example.com."),
+    RR("server.example.com", 300, RType.A, "192.168.1.1"),
+]
 
-It's probably quick to sync a zone by (1) asking he.net to be our primary DNS
-then (2) using the HTTP API to add RRs.
+headband.sync(
+    "uSeRnAmE",
+    "PaSsWoRd",
+    "example.com"
+    zone,
+)
+```
+
+Thank you, Hurricane Electric xx
