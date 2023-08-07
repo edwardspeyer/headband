@@ -142,7 +142,7 @@ def del_rr(session, zone_id, rr_id):
 
 @contextmanager
 def build_session():
-    path = Path.home() / ".local" / "share" / "aura" / "he.db"
+    path = Path.home() / ".local" / "share" / "headband.db"
     path.parent.mkdir(exist_ok=True, parents=True)
     key = "cookies"
     with shelve.open(path) as shelf:
