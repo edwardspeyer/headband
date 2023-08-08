@@ -29,6 +29,11 @@ SRV: RType = "SRV"
 SSHFP: RType = "SSHFP"
 TXT: RType = "TXT"
 
+NULL_PRIORITIES = {
+    "-",  # The default via the UI
+    "0",  # Converted zones get priority 0
+}
+
 
 @dataclass(eq=True, frozen=True)
 class RR:
@@ -91,7 +96,7 @@ def parse_rrs(doc):
             assert priority.isnumeric()
             rr = RR(rname, int(ttl), rtype, (int(priority), rdata))
         else:
-            assert priority == "-"
+            assert priority in NULL_PRIORITIES
             rr = RR(rname, int(ttl), rtype, rdata)
         yield rr, id
 
