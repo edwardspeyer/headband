@@ -1,0 +1,5 @@
+[project]
+name = "headband"
+license = {text = "MIT"}
+dependencies = ["bs4", "lxml", "requests"]
+version = "3.0"
