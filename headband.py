@@ -40,8 +40,17 @@ class RR:
 
 def sync(username, password, domain, rrs):
     with build_session() as session:
-        ensure_logged_in(session, username, password)
         response = session.get(URL)
+        if b"Account Menu" not in response.content:
+            response = session.post(
+                URL,
+                {
+                    "email": username,
+                    "pass": password,
+                    "submit": "Login!",
+                },
+            )
+        assert b"Account Menu" in response.content
         doc = parse_html(response.content)
         table = doc.select_one("#domains_table")
         domains = dict(parse_table(table)) if table else dict()
@@ -153,21 +162,6 @@ def build_session():
         yield session
         data = requests.utils.dict_from_cookiejar(session.cookies)
         shelf[key] = data
-
-
-def ensure_logged_in(session, username, password):
-    response = session.get(URL)
-    if b"Account Menu" in response.content:
-        return
-    print("logging in...")
-    session.post(
-        URL,
-        {
-            "email": username,
-            "pass": password,
-            "submit": "Login!",
-        },
-    )
 
 
 def parse_html(html):
